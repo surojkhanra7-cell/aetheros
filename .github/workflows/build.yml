@@ -1,0 +1,53 @@
+name: Build Android APK
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:  # Allows manual trigger from GitHub UI
+
+jobs:
+  build:
+    name: Build Android APK via EAS
+    runs-on: ubuntu-latest
+    steps:
+      # 1. Checkout repository
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # 2. Setup Node.js (match your project's Node version)
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm  # or 'yarn' if you use Yarn
+
+      # 3. Setup Expo / EAS CLI
+      - name: Setup Expo
+        uses: expo/expo-github-action@v8
+        with:
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+
+      # 4. Install dependencies
+      - name: Install dependencies
+        run: npm ci  # Use 'yarn install --frozen-lockfile' for Yarn
+
+      # 5. Trigger EAS Build for Android APK
+      - name: Build Android APK
+        run: |
+          eas build \
+            --platform android \
+            --profile preview \
+            --non-interactive \
+            --no-wait
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+
+      # Optional: Post build URL to PR or commit status
+      - name: Comment build URL
+        if: github.event_name == 'push'
+        run: |
+          echo "📱 Android APK build triggered successfully!"
+          echo "Check your build status at: https://expo.dev/accounts/YOUR_ACCOUNT/projects/YOUR_PROJECT/builds"
+          
