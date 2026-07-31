@@ -14,3 +14,14 @@ export default function App() {
     </SafeAreaProvider>
   );
 }
+{
+  "expo": {
+    "name": "aetheros",
+    ...
+    "extra": {
+      "eas": {
+        "projectId": "আপনার-প্রজেক্ট-আইডি"
+      }
+    }
+  }
+}
